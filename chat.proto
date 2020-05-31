@@ -1,0 +1,14 @@
+syntax = "proto3";
+package chat;
+
+import "google/protobuf/empty.proto";
+
+message Message { string body = 1; }
+
+service ChatService {
+  rpc SayHello(Message) returns (Message);
+  rpc SayHelloStream(stream Message) returns (Message);
+  rpc SayHelloStreamBidirectional(stream Message) returns (stream Message);
+  rpc WithoutParametersAndReturn(google.protobuf.Empty)
+      returns (google.protobuf.Empty);
+}
