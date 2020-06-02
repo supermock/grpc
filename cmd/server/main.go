@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/supermock/servicetmpl/chat"
+	"github.com/supermock/grpc/chat"
 )
 
 func main() {

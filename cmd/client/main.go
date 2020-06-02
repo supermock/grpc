@@ -12,7 +12,7 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 
-	"github.com/supermock/servicetmpl/chat"
+	"github.com/supermock/grpc/chat"
 )
 
 func main() {
