@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package recipe;
+
+option go_package = "github.com/supermock/grpc/recipe";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+message Message {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			title: "Message"
+			description: "Your message that send from GRPC or HTTP."
+			required: ["body"]
+		}
+		example: { value: '{ "body": "My little message" }' }
+	};
+
+  string body = 1 [(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {title: "Message body", description: "Your message for send."}];
+}

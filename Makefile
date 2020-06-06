@@ -1,15 +1,10 @@
-PROTOS_PATH := protos
+PROTO_PATH := proto
 
-PROTO_SRC_FILES := $(shell find $(PROTOS_PATH) -name '*.proto')
-PROTO_GEN_FILES := $(PROTO_SRC_FILES:$(PROTOS_PATH)/%.proto=%.pb.go)
-PROTO_SRC_TARGETS := $(PROTO_GEN_FILES:%.pb.go=$(PROTOS_PATH)/%.proto)
-proto_gen_target = $(addprefix $(dir $(proto_gen_file)),%.pb.go)
-PROTO_GEN_TARGETS := $(foreach proto_gen_file,$(PROTO_GEN_FILES),$(proto_gen_target))
+PROTO_SRC_FILES := $(shell find $(PROTO_PATH) -name '*.proto')
+PROTO_GEN_FILES := $(PROTO_SRC_FILES:$(PROTO_PATH)/%.proto=%.pb.go)
 
 CMD_SRC_FILES := $(wildcard cmd/**/main.go)
-CMD_SRC_TARGETS := cmd/%/main.go
 CMD_BIN_FILES := $(CMD_SRC_FILES:cmd/%/main.go=build/%)
-CMD_BIN_TARGETS := build/%
 
 GO_SRC_FILES := $(shell find . -name '*.go' -not -path './cmd/*')
 
@@ -17,13 +12,25 @@ GO_SRC_FILES := $(shell find . -name '*.go' -not -path './cmd/*')
 all: $(CMD_BIN_FILES)
 
 .SILENT: $(PROTO_GEN_FILES)
-$(PROTO_GEN_TARGETS): $(PROTO_SRC_TARGETS)
-	mkdir -p $(dir $@)
+$(PROTO_GEN_FILES): INCLUDE = -I$(PROTO_PATH) -I/usr/local/include -I${GOPATH}/src
+$(PROTO_GEN_FILES): INCLUDE += -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
+$(PROTO_GEN_FILES): INCLUDE += -I${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+$(PROTO_GEN_FILES): HOOKS = $(shell jq -rcM --arg proto $(<F) '.hooks[$$proto]? | @sh' $(PROTO_PATH)/$(@D)/metadata.json)
+$(PROTO_GEN_FILES): %.pb.go: $(PROTO_PATH)/%.proto
+	mkdir -p $(@D)
 	echo "Making $@"
-	protoc --proto_path=$(PROTOS_PATH) --go_out=plugins=grpc:. --go_opt=paths=source_relative $<
+	protoc $(INCLUDE) --go_out=plugins=grpc:. --go_opt=paths=source_relative $<
+	if [ -n "$(findstring gateway,$(HOOKS))" ]; then \
+		echo "Making ${@:%.go=%.gw.go}"; \
+		protoc $(INCLUDE) --grpc-gateway_out=logtostderr=false,paths=source_relative:. $<; \
+	fi
+	if [ -n "$(findstring swagger,$(HOOKS))" ]; then \
+		echo "Making ${@:%.pb.go=%.swagger.json}"; \
+		protoc $(INCLUDE) --swagger_out=logtostderr=false:. $<; \
+	fi
 
 .SILENT: $(CMD_BIN_FILES)
-$(CMD_BIN_TARGETS): $(CMD_SRC_TARGETS) $(GO_SRC_FILES) $(PROTO_GEN_FILES)
+$(CMD_BIN_FILES): build/%: cmd/%/main.go $(GO_SRC_FILES) $(PROTO_GEN_FILES)
 	mkdir -p build
 	echo "Making $@"
 	go build -o $@ $<

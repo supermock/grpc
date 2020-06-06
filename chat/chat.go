@@ -6,15 +6,16 @@ import (
 	"log"
 
 	empty "github.com/golang/protobuf/ptypes/empty"
+	recipe "github.com/supermock/grpc/recipe"
 )
 
 type Server struct {
 	UnimplementedChatServiceServer
 }
 
-func (s *Server) SayHello(ctx context.Context, in *Message) (*Message, error) {
+func (s *Server) SayHello(ctx context.Context, in *recipe.Message) (*recipe.Message, error) {
 	log.Printf("Receive message body from client: %s", in.Body)
-	return &Message{Body: "Hello From the Server!"}, nil
+	return &recipe.Message{Body: "Hello From the Server!"}, nil
 }
 
 func (s *Server) SayHelloStream(stream ChatService_SayHelloStreamServer) error {
@@ -35,7 +36,7 @@ func (s *Server) SayHelloStream(stream ChatService_SayHelloStreamServer) error {
 
 	log.Println("Finished stream")
 
-	return stream.SendAndClose(&Message{
+	return stream.SendAndClose(&recipe.Message{
 		Body: "All items received",
 	})
 }

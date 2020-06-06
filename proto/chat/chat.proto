@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "github.com/supermock/grpc/chat";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "recipe/message.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "Chat Service";
+		version: "0.1";
+  };
+  schemes: HTTP;
+	schemes: HTTPS;
+	schemes: WSS;
+	consumes: "application/json";
+  produces: "application/json";
+};
+
+service ChatService {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_tag) = {
+		description: "Chat service handle communication"
+	};
+
+  rpc SayHello(recipe.Message) returns (recipe.Message) {
+    option (google.api.http) = {
+      post: "/v1/chat/sayhello"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			description: "Description SayHello";
+			summary: "Summary: SayHello rpc";
+			tags: "rpc";
+			// responses: {
+			// 	key: "200"
+			// 	value: {
+			// 		examples: {
+			// 			key: "application/json"
+			// 			value: '{"body": "your message"}'
+			// 		}
+			// 	}
+			// }
+			// responses: {
+			// 	key: "503";
+			// 	value: {
+			// 		description: "Returned when the resource is temporarily unavailable.";
+			// 	}
+			// }
+			// responses: {
+			// 	// Overwrites global definition.
+			// 	key: "404";
+			// 	value: {
+			// 		description: "Returned when the resource does not exist.";
+			// 		schema: {
+			// 			json_schema: {
+      //         type: OBJECT;
+			// 			}
+			// 		}
+			// 	}
+			// }
+		};
+  };
+  rpc SayHelloStream(stream recipe.Message) returns (recipe.Message);
+  rpc SayHelloStreamBidirectional(stream recipe.Message) returns (stream recipe.Message);
+  rpc WithoutParametersAndReturn(google.protobuf.Empty)
+      returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          get: "/v1/chat/withoutparametersandreturn"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          tags: "rpc";
+        };
+      };
+}

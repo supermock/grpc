@@ -13,10 +13,11 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/supermock/grpc/chat"
+	"github.com/supermock/grpc/recipe"
 )
 
 func main() {
-	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
+	conn, err := grpc.Dial(":9001", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
@@ -31,7 +32,7 @@ func main() {
 		log.Fatalf("Error when calling WithoutParametersAndReturn: %s", err)
 	}
 
-	response, err := c.SayHello(ctx, &chat.Message{Body: "Hello From Client!"})
+	response, err := c.SayHello(ctx, &recipe.Message{Body: "Hello From Client!"})
 	if err != nil {
 		log.Fatalf("Error when calling SayHello: %s", err)
 	}
@@ -45,7 +46,7 @@ func main() {
 	}
 
 	for i := 1; i <= 5; i++ {
-		if err := streamToServer.Send(&chat.Message{
+		if err := streamToServer.Send(&recipe.Message{
 			Body: fmt.Sprintf("Hello From %d!", r.Intn(100)+1),
 		}); err != nil {
 			if err == io.EOF {
@@ -87,7 +88,7 @@ func main() {
 	}()
 
 	for i := 1; i <= 5; i++ {
-		if err := streamBidirectional.Send(&chat.Message{
+		if err := streamBidirectional.Send(&recipe.Message{
 			Body: fmt.Sprintf("Hello From %d!", r.Intn(100)+1),
 		}); err != nil {
 			log.Fatalf("Failed to send a message: %v", err)
