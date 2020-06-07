@@ -35,4 +35,5 @@ $(CMD_BIN_FILES): build/%: cmd/%/main.go $(GO_SRC_FILES) $(PROTO_GEN_FILES)
 	echo "Making $@"
 	go build -o $@ $<
 
+.PHONY: protobuf
 protobuf: $(PROTO_GEN_FILES)
