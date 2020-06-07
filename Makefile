@@ -47,9 +47,9 @@ $(PROTO_GEN_FILES_RM_TARGET):	PROTO_GEN_PB_FILE = $(subst rm/,,$(@))
 $(PROTO_GEN_FILES_RM_TARGET):	PROTO_GEN_GW_FILE = $(call proto_gw_file,$(PROTO_GEN_PB_FILE))
 $(PROTO_GEN_FILES_RM_TARGET):	PROTO_GEN_SW_FILE = $(call proto_sw_file,$(PROTO_GEN_PB_FILE))
 $(PROTO_GEN_FILES_RM_TARGET):
-	$(if $(wildcard $(PROTO_GEN_PB_FILE)),$(shell rm -f $(PROTO_GEN_PB_FILE)))
-	$(if $(wildcard $(PROTO_GEN_GW_FILE)),$(shell rm -f $(PROTO_GEN_GW_FILE)))
-	$(if $(wildcard $(PROTO_GEN_SW_FILE)),$(shell rm -f $(PROTO_GEN_SW_FILE)))
+	rm -f $(PROTO_GEN_PB_FILE)
+	rm -f $(PROTO_GEN_GW_FILE)
+	rm -f $(PROTO_GEN_SW_FILE)
 
 .PHONY: protobuf
 protobuf: $(PROTO_GEN_FILES)
