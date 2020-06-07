@@ -50,6 +50,37 @@
         ]
       }
     },
+    "/v1/chat/sayhellostreamfromserver": {
+      "get": {
+        "operationId": "ChatService_SayHelloStreamFromServer",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/recipeMessage"
+                },
+                "error": {
+                  "$ref": "#/definitions/runtimeStreamError"
+                }
+              },
+              "title": "Stream result of recipeMessage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "rpc"
+        ]
+      }
+    },
     "/v1/chat/withoutparametersandreturn": {
       "get": {
         "operationId": "ChatService_WithoutParametersAndReturn",

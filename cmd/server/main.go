@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"google.golang.org/grpc"
 
@@ -38,7 +39,7 @@ func runGRPCServer(ctx context.Context, server *chat.Server) error {
 	return grpcServer.Serve(listen)
 }
 
-func runHTTPServer(ctx context.Context, server *chat.Server) error {
+func runHTTPServer(ctx context.Context) error {
 	listen, err := net.Listen("tcp", ":9000")
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
@@ -51,7 +52,11 @@ func runHTTPServer(ctx context.Context, server *chat.Server) error {
 	}()
 
 	rmux := runtime.NewServeMux()
-	err = chat.RegisterChatServiceHandlerServer(ctx, rmux, server)
+
+	err = chat.RegisterChatServiceHandlerFromEndpoint(ctx, rmux, ":9001", []grpc.DialOption{
+		grpc.WithInsecure(),
+		grpc.WithBackoffMaxDelay(10 * time.Second),
+	})
 	if err != nil {
 		fmt.Printf("failed to handle: %v\n", err)
 		return err
@@ -101,7 +106,7 @@ func runServers(ctx context.Context) <-chan error {
 	}()
 
 	go func() {
-		if err := runHTTPServer(ctx, server); err != nil {
+		if err := runHTTPServer(ctx); err != nil {
 			ch <- fmt.Errorf("cannot run in http gateway service: %v", err)
 		}
 	}()

@@ -34,3 +34,5 @@ $(CMD_BIN_FILES): build/%: cmd/%/main.go $(GO_SRC_FILES) $(PROTO_GEN_FILES)
 	mkdir -p build
 	echo "Making $@"
 	go build -o $@ $<
+
+protobuf: $(PROTO_GEN_FILES)
